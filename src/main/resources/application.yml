@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: TripPick_backend_PubDataBridge
