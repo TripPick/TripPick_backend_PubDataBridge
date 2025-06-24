@@ -29,7 +29,7 @@ public class DetailCommonService {
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
-    @Scheduled(cron = "*/10 * * * * *")
+    //@Scheduled(cron = "*/10 * * * * *")
     public void fetchAndSaveDetails() {
         log.info("==== [스케줄러 실행됨] ====");
         String serviceKey = "service key";

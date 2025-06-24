@@ -1,8 +1,10 @@
 package com.example.TripPick_backend_PubDataBridge.service;
 
 import com.example.TripPick_backend_PubDataBridge.domain.LocTourList;
+import com.example.TripPick_backend_PubDataBridge.domain.event.LocTourListEvent;
 import com.example.TripPick_backend_PubDataBridge.dto.request.LocTourListRequest;
 import com.example.TripPick_backend_PubDataBridge.dto.response.LocTourListResponse;
+import com.example.TripPick_backend_PubDataBridge.event.producer.KafkaMessageProducer;
 import com.example.TripPick_backend_PubDataBridge.repository.LocTourListRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,10 +28,11 @@ public class LocTourListService {
     private final LocTourListRepository locTourListRepository;
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
+    private final KafkaMessageProducer kafkaMessageProducer;
 
     String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "*/10 * * * * *")
     public void autoFetchAndSave() {
         String serviceKey = "service key";
         //12: 관광지, 14: 문화시설, 15: 축제공연행사 25: 여행코스
@@ -54,7 +57,7 @@ public class LocTourListService {
                 .queryParam("MobileApp", "AppTest")
                 .queryParam("MobileOS", "ETC")
                 .queryParam("contentTypeId", contentTypeID)
-                .queryParam("modifiedTime", today)
+                //.queryParam("modifiedtime", today)
                 .queryParam("_type", "json")
                 .build()
                 .toUriString();
@@ -99,26 +102,20 @@ public class LocTourListService {
                     .cat3(dto.getCat3())
                     .firstimage(dto.getFirstimage())
                     .firstimage2(dto.getFirstimage2())
-                    .cpyrhtDivCd(dto.getCpyrhtDivCd())
-                    .mapx(dto.getMapx())
-                    .mapy(dto.getMapy())
-                    .mlevel(dto.getMlevel())
-                    .sigunguCode(dto.getSigungucode())
                     .tel(dto.getTel())
                     .title(dto.getTitle())
                     .zipcode(dto.getZipcode())
                     .lDongRegnCd(dto.getLDongRegnCd())
                     .lDongSignguCd(dto.getLDongSigunguCd())
-                    .lclsSystm1(dto.getLclsSystm1())
-                    .lclsSystm2(dto.getLclsSystm2())
-                    .lclsSystm3(dto.getLclsSystm3())
                     .build();
 
             entity.setCreatedTimeFromString(dto.getCreatedtime());
             entity.setModifiedTimeFromString(dto.getModifiedtime());
 
+            LocTourListEvent event = LocTourListEvent.fromEntity("list", entity);
+
             log.info("전송 시도: contentId={}", dto.getContentid());
-            //kafka
+            kafkaMessageProducer.send(LocTourListEvent.Topic, event);
             log.info("전송 완료: contentId={}", dto.getContentid());
         }
     }
