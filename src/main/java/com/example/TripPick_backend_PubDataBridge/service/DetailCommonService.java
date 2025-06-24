@@ -32,7 +32,7 @@ public class DetailCommonService {
     @Scheduled(cron = "*/10 * * * * *")
     public void fetchAndSaveDetails() {
         log.info("==== [스케줄러 실행됨] ====");
-        String serviceKey = "ggKSFIY8e2VWWAtrAJR9X0tpHxfG5xL/viLjukhurELWWaVwnS9PVma70rnMTdytv8mG1uY4qL59cWOMPmxrWA==";
+        String serviceKey = "service key";
 
         List<LocTourList> locTourLists = locTourListRepository.findAll();
 

@@ -31,7 +31,7 @@ public class LocTourListService {
 
     @Scheduled(cron = "0 0 * * * *")
     public void autoFetchAndSave() {
-        String serviceKey = "ggKSFIY8e2VWWAtrAJR9X0tpHxfG5xL/viLjukhurELWWaVwnS9PVma70rnMTdytv8mG1uY4qL59cWOMPmxrWA==";
+        String serviceKey = "service key";
         //12: 관광지, 14: 문화시설, 15: 축제공연행사 25: 여행코스
         List<String> contentTypeIds = List.of("12", "14", "15", "25");
 
