@@ -1,7 +1,7 @@
 package com.example.TripPick_backend_PubDataBridge.service;
 
 import com.example.TripPick_backend_PubDataBridge.domain.DetailCommon;
-import com.example.TripPick_backend_PubDataBridge.domain.LocTourList;
+import com.example.TripPick_backend_PubDataBridge.domain.Search;
 import com.example.TripPick_backend_PubDataBridge.dto.response.DetailCommonResponse;
 import com.example.TripPick_backend_PubDataBridge.repository.DetailCommonRepository;
 import com.example.TripPick_backend_PubDataBridge.repository.LocTourListRepository;
@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -31,12 +30,11 @@ public class DetailCommonService {
 
     //@Scheduled(cron = "*/10 * * * * *")
     public void fetchAndSaveDetails() {
-        log.info("==== [스케줄러 실행됨] ====");
-        String serviceKey = "service key";
+        String serviceKey = "ggKSFIY8e2VWWAtrAJR9X0tpHxfG5xL/viLjukhurELWWaVwnS9PVma70rnMTdytv8mG1uY4qL59cWOMPmxrWA==";
 
-        List<LocTourList> locTourLists = locTourListRepository.findAll();
+        List<Search> Searches = locTourListRepository.findAll();
 
-        for (LocTourList listItem : locTourLists) {
+        for (Search listItem : Searches) {
             try {
                 String contentId = listItem.getContentid();
 

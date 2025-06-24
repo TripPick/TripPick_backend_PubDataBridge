@@ -43,30 +43,22 @@ public class LocTourListResponse {
     @Getter
     @Setter
     public static class Item {
-        private String addr1;           //주소 0
-        private String addr2;           //상세주소 0
-        private String areacode;       //지역코드 0
-        private String cat1;            //대분류 0
-        private String cat2;            //중분류 0
-        private String cat3;            //소분류 0
-        private String contentid;       //콘텐츠ID 1
-        private String contenttypeid;   //콘텐츠타입ID 1
-        private String createdtime;     //등록일 1
-        private String firstimage;      //대표이미지(원본) 0
-        private String firstimage2;     //대표이미지(썸네일) 0
-        private String cpyrhtDivCd;     //저작권유형 0
-        private Double mapx;            //GPS X좌표 0
-        private Double mapy;            //GPS Y좌표 0
-        private String mlevel;          //Map Level 0
-        private String modifiedtime;    //수정일 1
-        private String sigungucode;     //시군구코드 0
-        private String tel;             //전화번호 0
-        private String title;           //제목 1
-        private String zipcode;         //우편번호 0
-        private String lDongRegnCd;     //법정동 시도 코드 0
-        private String lDongSigunguCd;  //법정동 시군구 코드 0
-        private String lclsSystm1;      //분류체계 대분류 0
-        private String lclsSystm2;      //분류체계 중분류 0
-        private String lclsSystm3;      //분류체계 소분류 0
+        private String contentid;
+        private String contenttypeid;
+        private String cat1;
+        private String cat2;
+        private String cat3;
+        private String lDongSignguCd;
+        private String lDongRegnCd;
+        private String areacode;
+        private String addr1;
+        private String addr2;
+        private String firstimage;
+        private String firstimage2;
+        private String tel;
+        private String title;
+        private String zipcode;
+        private String modifiedtime;
+        private String createdtime;
     }
 }

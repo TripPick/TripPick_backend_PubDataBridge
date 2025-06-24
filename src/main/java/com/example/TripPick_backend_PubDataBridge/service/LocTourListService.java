@@ -1,6 +1,6 @@
 package com.example.TripPick_backend_PubDataBridge.service;
 
-import com.example.TripPick_backend_PubDataBridge.domain.LocTourList;
+import com.example.TripPick_backend_PubDataBridge.domain.Search;
 import com.example.TripPick_backend_PubDataBridge.domain.event.LocTourListEvent;
 import com.example.TripPick_backend_PubDataBridge.dto.request.LocTourListRequest;
 import com.example.TripPick_backend_PubDataBridge.dto.response.LocTourListResponse;
@@ -34,7 +34,7 @@ public class LocTourListService {
 
     @Scheduled(cron = "*/10 * * * * *")
     public void autoFetchAndSave() {
-        String serviceKey = "service key";
+        String serviceKey = "ggKSFIY8e2VWWAtrAJR9X0tpHxfG5xL/viLjukhurELWWaVwnS9PVma70rnMTdytv8mG1uY4qL59cWOMPmxrWA==";
         //12: 관광지, 14: 문화시설, 15: 축제공연행사 25: 여행코스
         List<String> contentTypeIds = List.of("12", "14", "15", "25");
 
@@ -86,12 +86,7 @@ public class LocTourListService {
 //        }
 
         for (LocTourListResponse.Item dto : response.getResponse().getBody().getItems().getItem()) {
-            if (locTourListRepository.existsById(dto.getContentid())) {
-                log.info("이미 존재하는 데이터입니다. contentId={}", dto.getContentid());
-                continue;
-            }
-
-            LocTourList entity = LocTourList.builder()
+            Search entity = Search.builder()
                     .contentid(dto.getContentid())
                     .contenttypeid(dto.getContenttypeid())
                     .addr1(dto.getAddr1())
@@ -106,7 +101,7 @@ public class LocTourListService {
                     .title(dto.getTitle())
                     .zipcode(dto.getZipcode())
                     .lDongRegnCd(dto.getLDongRegnCd())
-                    .lDongSignguCd(dto.getLDongSigunguCd())
+                    .lDongSignguCd(dto.getLDongSignguCd())
                     .build();
 
             entity.setCreatedTimeFromString(dto.getCreatedtime());
@@ -120,8 +115,8 @@ public class LocTourListService {
         }
     }
 
-    public List<LocTourList> searchByConditions(LocTourListRequest cond) {
-        Specification<LocTourList> spec = (root, query, cb) -> cb.conjunction();
+    public List<Search> searchByConditions(LocTourListRequest cond) {
+        Specification<Search> spec = (root, query, cb) -> cb.conjunction();
         //관광타입ID
         if (cond.getContentTypeId() != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("contenttypeid"), cond.getContentTypeId()));

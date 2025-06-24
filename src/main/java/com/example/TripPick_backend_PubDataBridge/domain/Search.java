@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LocTourList {
+public class Search {
     @Id
     @Column(name = "contentid")
     private String contentid;
@@ -82,7 +82,23 @@ public class LocTourList {
         if (dateTimeStr == null || dateTimeStr.isEmpty()) {
             return null;
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        return LocalDateTime.parse(dateTimeStr, formatter);
+
+        try {
+            if (dateTimeStr.length() == 14) {
+                // yyyyMMddHHmmss
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+                return LocalDateTime.parse(dateTimeStr, formatter);
+            } else if (dateTimeStr.length() == 8) {
+                // yyyyMMdd → 날짜만 있고 시간 없음, 00:00:00 기본 설정
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                return LocalDateTime.parse(dateTimeStr, formatter).withHour(0).withMinute(0).withSecond(0);
+            } else {
+                // 지원하지 않는 형식일 경우 null 반환
+                return null;
+            }
+        } catch (Exception e) {
+            // 혹시나 파싱 예외가 생겼을 경우
+            return null;
+        }
     }
 }

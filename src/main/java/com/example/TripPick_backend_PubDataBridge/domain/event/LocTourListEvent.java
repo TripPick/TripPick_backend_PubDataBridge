@@ -1,6 +1,6 @@
 package com.example.TripPick_backend_PubDataBridge.domain.event;
 
-import com.example.TripPick_backend_PubDataBridge.domain.LocTourList;
+import com.example.TripPick_backend_PubDataBridge.domain.Search;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,13 +9,13 @@ import lombok.Setter;
 public class LocTourListEvent {
     public static final String Topic = "searchinfo";
     private String action;
-    private LocTourList locTourList;
+    private Search search;
 
-    public static LocTourListEvent fromEntity(String action, LocTourList locTourList) {
+    public static LocTourListEvent fromEntity(String action, Search search) {
         LocTourListEvent message = new LocTourListEvent();
 
         message.action = action;
-        message.locTourList = locTourList;
+        message.search = search;
 
         return message;
     }
