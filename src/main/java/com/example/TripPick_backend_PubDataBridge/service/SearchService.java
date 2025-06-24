@@ -1,14 +1,13 @@
 package com.example.TripPick_backend_PubDataBridge.service;
 
+import com.example.TripPick_backend_PubDataBridge.config.KafkaConfig;
+import com.example.TripPick_backend_PubDataBridge.config.PropertiesConfig;
 import com.example.TripPick_backend_PubDataBridge.domain.Search;
-import com.example.TripPick_backend_PubDataBridge.domain.event.LocTourListEvent;
-import com.example.TripPick_backend_PubDataBridge.dto.request.LocTourListRequest;
-import com.example.TripPick_backend_PubDataBridge.dto.response.LocTourListResponse;
-import com.example.TripPick_backend_PubDataBridge.event.producer.KafkaMessageProducer;
-import com.example.TripPick_backend_PubDataBridge.repository.LocTourListRepository;
+import com.example.TripPick_backend_PubDataBridge.domain.event.SearchEvent;
+import com.example.TripPick_backend_PubDataBridge.dto.response.SearchResponse;
+import com.example.TripPick_backend_PubDataBridge.event.producer.SearchProducer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,23 +23,23 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LocTourListService {
-    private final LocTourListRepository locTourListRepository;
+public class SearchService {
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
-    private final KafkaMessageProducer kafkaMessageProducer;
+    private final SearchProducer searchProducer;
+    private final PropertiesConfig propertiesConfig;
 
     String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
     @Scheduled(cron = "*/10 * * * * *")
-    public void autoFetchAndSave() {
-        String serviceKey = "ggKSFIY8e2VWWAtrAJR9X0tpHxfG5xL/viLjukhurELWWaVwnS9PVma70rnMTdytv8mG1uY4qL59cWOMPmxrWA==";
+    public void autoFetchAndSend() {
+        String serviceKey = propertiesConfig.getServiceKey();
         //12: 관광지, 14: 문화시설, 15: 축제공연행사 25: 여행코스
         List<String> contentTypeIds = List.of("12", "14", "15", "25");
 
         for (String contentTypeId : contentTypeIds) {
             try {
-                fetchAndSaveTourList(serviceKey, contentTypeId);
+                fetchAndSendList(serviceKey, contentTypeId);
                 log.info("리스트 전송 완료: contentId={}", contentTypeId);
             } catch (Exception e) {
                 log.error("contentTypeId={} 리스트 전송 실패: ", contentTypeId, e);
@@ -49,7 +48,7 @@ public class LocTourListService {
     }
 
     @Transactional
-    public void fetchAndSaveTourList(String serviceKey, String contentTypeID) {
+    public void fetchAndSendList(String serviceKey, String contentTypeID) {
         String rawUrl = "https://apis.data.go.kr/B551011/KorService2/areaBasedList2";
         String url = UriComponentsBuilder.newInstance()
                 .uri(URI.create(rawUrl))
@@ -64,10 +63,10 @@ public class LocTourListService {
 
         log.info("요청 URL: {}", url);
 
-        LocTourListResponse response = null;
+        SearchResponse response = null;
 
         try {
-            response = restTemplate.getForObject(url, LocTourListResponse.class);
+            response = restTemplate.getForObject(url, SearchResponse.class);
 
             if (response != null) {
                 log.info("API 응답 객체 (JSON): {}", objectMapper.writeValueAsString(response));
@@ -76,16 +75,16 @@ public class LocTourListService {
             throw new RuntimeException(e);
         }
 
-//        if (response == null
-//                || response.getResponse() == null
-//                || response.getResponse().getBody() == null
-//                || response.getResponse().getBody().getItems() == null
-//                || response.getResponse().getBody().getItems().getItem() == null) {
-//            log.warn("API 응답 데이터가 없습니다.");
-//            return;
-//        }
+        if (response == null
+                || response.getResponse() == null
+                || response.getResponse().getBody() == null
+                || response.getResponse().getBody().getItems() == null
+                || response.getResponse().getBody().getItems().getItem() == null) {
+            log.warn("API 응답 데이터가 없습니다.");
+            return;
+        }
 
-        for (LocTourListResponse.Item dto : response.getResponse().getBody().getItems().getItem()) {
+        for (SearchResponse.Item dto : response.getResponse().getBody().getItems().getItem()) {
             Search entity = Search.builder()
                     .contentid(dto.getContentid())
                     .contenttypeid(dto.getContenttypeid())
@@ -107,42 +106,9 @@ public class LocTourListService {
             entity.setCreatedTimeFromString(dto.getCreatedtime());
             entity.setModifiedTimeFromString(dto.getModifiedtime());
 
-            LocTourListEvent event = LocTourListEvent.fromEntity("list", entity);
-
-            log.info("전송 시도: contentId={}", dto.getContentid());
-            kafkaMessageProducer.send(LocTourListEvent.Topic, event);
-            log.info("전송 완료: contentId={}", dto.getContentid());
+            SearchEvent event = SearchEvent.fromEntity("list", entity);
+            searchProducer.send(KafkaConfig.topics.SEARCH, event);
         }
-    }
-
-    public List<Search> searchByConditions(LocTourListRequest cond) {
-        Specification<Search> spec = (root, query, cb) -> cb.conjunction();
-        //관광타입ID
-        if (cond.getContentTypeId() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("contenttypeid"), cond.getContentTypeId()));
-        }
-        //대분류
-        if (cond.getCat1() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("cat1"), cond.getCat1()));
-        }
-        //중분류
-        if (cond.getCat2() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("cat2"), cond.getCat2()));
-        }
-        //소분류
-        if (cond.getCat3() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("cat3"), cond.getCat3()));
-        }
-        //법정동 시도 코드
-        if (cond.getLDongRegnCd() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("lDongRegnCd"), cond.getLDongRegnCd()));
-        }
-        //법정동 시군구 코드
-        if (cond.getLDongSignguCd() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("lDongSignguCd"), cond.getLDongSignguCd()));
-        }
-
-        return locTourListRepository.findAll(spec);
     }
 
 }

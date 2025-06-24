@@ -6,13 +6,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class LocTourListEvent {
-    public static final String Topic = "searchinfo";
+public class SearchEvent {
     private String action;
     private Search search;
 
-    public static LocTourListEvent fromEntity(String action, Search search) {
-        LocTourListEvent message = new LocTourListEvent();
+    public static SearchEvent fromEntity(String action, Search search) {
+        SearchEvent message = new SearchEvent();
 
         message.action = action;
         message.search = search;
