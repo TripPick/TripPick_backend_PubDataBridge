@@ -87,7 +87,7 @@ public class SearchService {
         for (SearchResponse.Item dto : response.getResponse().getBody().getItems().getItem()) {
             Search entity = Search.builder()
                     .contentid(dto.getContentid())
-                    .contenttypeid(dto.getContenttypeid())
+                    .contentTypeid(dto.getContenttypeid())
                     .addr1(dto.getAddr1())
                     .addr2(dto.getAddr2())
                     .areacode(dto.getAreacode())

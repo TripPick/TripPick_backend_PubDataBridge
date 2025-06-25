@@ -18,11 +18,11 @@ import java.time.format.DateTimeFormatter;
 @Builder
 public class Search {
     @Id
-    @Column(name = "contentid")
+    @Column(name = "contentid", length = 20)
     private String contentid;
 
-    @Column(name = "contenttypeid")
-    private String contenttypeid;
+    @Column(name = "contenttypeid", length = 2)
+    private String contentTypeid;
 
     @Column(name = "cat1")
     private String cat1;
@@ -33,10 +33,10 @@ public class Search {
     @Column(name = "cat3")
     private String cat3;
 
-    @Column(name = "lDongSignguCd")
+    @Column(name = "lDong_signgu_cd")
     private String lDongSignguCd;
 
-    @Column(name = "lDongRegnCd")
+    @Column(name = "l_dong_regn_cd")
     private String lDongRegnCd;
 
     @Column(name = "areacode")

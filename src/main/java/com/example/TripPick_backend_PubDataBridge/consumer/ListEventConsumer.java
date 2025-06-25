@@ -2,10 +2,7 @@ package com.example.TripPick_backend_PubDataBridge.consumer;
 
 import com.example.TripPick_backend_PubDataBridge.config.KafkaConfig;
 import com.example.TripPick_backend_PubDataBridge.domain.event.SearchEvent;
-import com.example.TripPick_backend_PubDataBridge.service.CulturalFacilityService;
-import com.example.TripPick_backend_PubDataBridge.service.FestivalService;
-import com.example.TripPick_backend_PubDataBridge.service.TourCourseService;
-import com.example.TripPick_backend_PubDataBridge.service.TourSpotService;
+import com.example.TripPick_backend_PubDataBridge.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,15 +12,18 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ListEventConsumer {
+    private final DetailCommonService detailCommonService;
     private final CulturalFacilityService culturalFacilityService;
     private final FestivalService festivalService;
     private final TourSpotService tourSpotService;
-    private final TourCourseService tourCourseService;
+    private final TourCourseItemService tourCourseItemService;
 
     @KafkaListener(topics = KafkaConfig.topics.SEARCH)
     public void handlerListEvent(SearchEvent event) {
-        String contentTypeId = event.getSearch().getContenttypeid();
+        String contentTypeId = event.getSearch().getContentTypeid();
         String contentId = event.getSearch().getContentid();
+
+        detailCommonService.fetchAndSend(contentId);
 
         switch (contentTypeId) {
             case KafkaConfig.contentTypeId.CULTURALFACILITY:
@@ -36,12 +36,11 @@ public class ListEventConsumer {
                 tourSpotService.fetchAndSend(contentTypeId, contentId);
                 break;
             case KafkaConfig.contentTypeId.TOURCOURSE:
-                tourCourseService.fetchAndSend(contentTypeId, contentId);
+                tourCourseItemService.fetchAndSend(contentTypeId, contentId);
                 break;
             default:
                 log.warn("지원하지 않는 contentTypeId: {}", contentTypeId);
         }
 
-        culturalFacilityService.fetchAndSend(contentTypeId, contentId);
     }
 }

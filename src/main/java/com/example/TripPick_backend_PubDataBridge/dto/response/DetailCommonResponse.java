@@ -1,7 +1,5 @@
 package com.example.TripPick_backend_PubDataBridge.dto.response;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,14 +7,14 @@ import java.util.List;
 
 @Getter
 @Setter
-public class TourCourseResponse {
+public class DetailCommonResponse {
     private Response response;
 
     @Getter
     @Setter
     public static class Response {
-        private Header header;
-        private Body body;
+        private DetailCommonResponse.Header header;
+        private DetailCommonResponse.Body body;
     }
 
     @Getter
@@ -29,7 +27,7 @@ public class TourCourseResponse {
     @Getter
     @Setter
     public static class Body {
-        private Items items;
+        private DetailCommonResponse.Items items;
         private int numOfRows;
         private int pageNo;
         private int totalCount;
@@ -38,20 +36,23 @@ public class TourCourseResponse {
     @Getter
     @Setter
     public static class Items {
-        @JacksonXmlElementWrapper(useWrapping = false)
-        @JacksonXmlProperty(localName = "item")
-        private List<Item> item;
+        private List<DetailCommonResponse.Item> item;
     }
 
     @Getter
     @Setter
     public static class Item {
         private String contentid;
-        private String subnum;
-        private String subcontentid;
-        private String subname;
-        private String subdetailoverview;
-        private String subdetailimg;
-        private String subdetailalt;
+        private String contenttypeid;
+        private String areacode;
+        private String addr1;
+        private String addr2;
+        private String firstimage;
+        private String firstimage2;
+        private String tel;
+        private String title;
+        private String zipcode;
+        private String createdtime;
+        private String modifiedtime;
     }
 }

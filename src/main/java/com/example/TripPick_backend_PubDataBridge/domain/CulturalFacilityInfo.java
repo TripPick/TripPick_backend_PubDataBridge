@@ -16,8 +16,8 @@ import lombok.*;
 public class CulturalFacilityInfo {
 
     @Id
-    @Column(name = "contentId")
-    private String contentId;
+    @Column(name = "contentid")
+    private String contentid;
 
     @Column(name = "accomcountculture", length = 225)
     private String accomcountculture;
@@ -57,5 +57,4 @@ public class CulturalFacilityInfo {
 
     @Column(name = "spendtime", length = 225)
     private String spendtime;
-
 }

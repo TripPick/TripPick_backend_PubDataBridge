@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
 public class TourSpotInfo {
 
     @Id
-    @Column(name = "contentId")
-    private String contentId;
+    @Column(name = "contentid")
+    private String contentid;
 
     @Column(name = "accomcount", length = 255)
     private String accomcount;

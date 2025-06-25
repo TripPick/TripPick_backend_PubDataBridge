@@ -15,44 +15,22 @@ import lombok.*;
 @Builder
 public class TourCourseInfo {
 
-//    @Id
-//    @Column(name = "contentId")
-//    private String contentId;
-//
-//    @Column(name = "distance", length = 225)
-//    private String distance;
-//
-//    @Column(name = "infocentertourcourse", length = 225)
-//    private String infocentertourcourse;
-//
-//    @Column(name = "schedule", length = 225)
-//    private String schedule;
-//
-//    @Column(name = "taketime", length = 225)
-//    private String taketime;
-//
-//    @Column(name = "theme", length = 225)
-//    private String theme;
-
     @Id
-    @Column(name = "contentId")
-    private String contentId;
+    @Column(name = "contentid")
+    private String contentid;
 
-    @Column(name = "subcontentId")
-    private String subcontentId;
+    @Column(name = "distance", length = 225)
+    private String distance;
 
-    @Column(name = "subdetailalt")
-    private String subdetailalt;
+    @Column(name = "infocentertourcourse", length = 225)
+    private String infocentertourcourse;
 
-    @Column(name = "subdetailimg")
-    private String subdetailimg;
+    @Column(name = "schedule", length = 225)
+    private String schedule;
 
-    @Column(name = "subdetailoverview")
-    private String subdetailoverview;
+    @Column(name = "taketime", length = 225)
+    private String taketime;
 
-    @Column(name = "subname")
-    private String subname;
-
-    @Column(name = "subnum")
-    private String subnum;
+    @Column(name = "theme", length = 225)
+    private String theme;
 }

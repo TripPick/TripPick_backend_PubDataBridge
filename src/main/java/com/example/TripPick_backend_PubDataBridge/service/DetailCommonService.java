@@ -2,10 +2,10 @@ package com.example.TripPick_backend_PubDataBridge.service;
 
 import com.example.TripPick_backend_PubDataBridge.config.KafkaConfig;
 import com.example.TripPick_backend_PubDataBridge.config.PropertiesConfig;
-import com.example.TripPick_backend_PubDataBridge.domain.TourCourseInfo;
-import com.example.TripPick_backend_PubDataBridge.domain.event.TourCourseEvent;
-import com.example.TripPick_backend_PubDataBridge.dto.response.TourCourseResponse;
-import com.example.TripPick_backend_PubDataBridge.event.producer.TourCourseProducer;
+import com.example.TripPick_backend_PubDataBridge.domain.DetailCommon;
+import com.example.TripPick_backend_PubDataBridge.domain.event.DetailCommonEvent;
+import com.example.TripPick_backend_PubDataBridge.dto.response.DetailCommonResponse;
+import com.example.TripPick_backend_PubDataBridge.event.producer.DetailCommonProducer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,38 +16,35 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TourCourseService {
+public class DetailCommonService {
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
-    private final TourCourseProducer tourCourseProducer;
+    private final DetailCommonProducer detailCommonProducer;
     private final PropertiesConfig propertiesConfig;
 
-    public void fetchAndSend(String contentTypeId, String contentId) {
+    public void fetchAndSend(String contentId) {
         String serviceKey = propertiesConfig.getServiceKey();
 
         try {
-            fetchAndSendInfo(serviceKey, contentTypeId, contentId);
+            fetchAndSendInfo(serviceKey, contentId);
             log.info("리스트 전송 완료: contentId={}", contentId);
         } catch (Exception e) {
-            log.error("contentTypeId={} 리스트 전송 실패: ", contentId, e);
+            log.error("contentId={} 리스트 전송 실패: ", contentId, e);
         }
     }
 
     @Transactional
-    public void fetchAndSendInfo(String serviceKey, String contentTypeId, String contentId) {
-        String rawUrl = "https://apis.data.go.kr/B551011/KorService2/detailInfo2";
+    public void fetchAndSendInfo(String serviceKey, String contentId) {
+        String rawUrl = "https://apis.data.go.kr/B551011/KorService2/detailCommon2";
         String url = UriComponentsBuilder.newInstance()
                 .uri(URI.create(rawUrl))
                 .queryParam("serviceKey", serviceKey)
                 .queryParam("MobileApp", "AppTest")
                 .queryParam("MobileOS", "ETC")
-                .queryParam("contentTypeId", contentTypeId)
                 .queryParam("contentId", contentId)
                 //.queryParam("modifiedtime", today)
                 .queryParam("_type", "json")
@@ -56,10 +53,10 @@ public class TourCourseService {
 
         log.info("요청 URL: {}", url);
 
-        TourCourseResponse response = null;
+        DetailCommonResponse response = null;
 
         try {
-            response = restTemplate.getForObject(url, TourCourseResponse.class);
+            response = restTemplate.getForObject(url, DetailCommonResponse.class);
 
             if (response != null) {
                 log.info("API 응답 객체 (JSON): {}", objectMapper.writeValueAsString(response));
@@ -78,23 +75,24 @@ public class TourCourseService {
             return;
         }
 
-        List<TourCourseInfo> entityList = new ArrayList<>();
-        for (TourCourseResponse.Item dto : response.getResponse().getBody().getItems().getItem()) {
-            TourCourseInfo entity = TourCourseInfo.builder()
-                    .contentId(dto.getContentid())
-                    .subnum(dto.getSubnum())
-                    .subcontentId(dto.getSubcontentid())
-                    .subname(dto.getSubname())
-                    .subdetailoverview(dto.getSubdetailoverview())
-                    .subdetailimg(dto.getSubdetailimg())
-                    .subdetailalt(dto.getSubdetailalt())
+        for (DetailCommonResponse.Item dto : response.getResponse().getBody().getItems().getItem()) {
+            DetailCommon entity = DetailCommon.builder()
+                    .contentid(dto.getContentid())
+                    .contentTypeId(dto.getContenttypeid())
+                    .areacode(dto.getAreacode())
+                    .addr1(dto.getAddr1())
+                    .addr2(dto.getAddr2())
+                    .firstImage(dto.getFirstimage())
+                    .firstImage2(dto.getFirstimage2())
+                    .tel(dto.getTel())
+                    .title(dto.getTitle())
+                    .zipcode(dto.getZipcode())
+                    .createdTime(dto.getCreatedtime())
+                    .modifiedTime(dto.getCreatedtime())
                     .build();
-            entityList.add(entity);
+
+            DetailCommonEvent event = DetailCommonEvent.fromEntity("detailcommon", entity);
+            detailCommonProducer.send(KafkaConfig.topics.DETAILCOMMON, event);
         }
-
-        TourCourseEvent listEvent = TourCourseEvent.fromEntityList("tourcourse_list", entityList);
-
-        tourCourseProducer.send(KafkaConfig.topics.TOURCOURSE, listEvent);
     }
-
 }

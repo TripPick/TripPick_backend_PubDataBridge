@@ -78,7 +78,7 @@ public class TourSpotService {
 
         for (TourSpotResponse.Item dto : response.getResponse().getBody().getItems().getItem()) {
             TourSpotInfo entity = TourSpotInfo.builder()
-                    .contentId(dto.getContentid())
+                    .contentid(dto.getContentid())
                     .accomcount(dto.getAccomcount())
                     .chkbabycarriage(dto.getChkbabycarriage())
                     .chkcreditcard(dto.getChkcreditcard())

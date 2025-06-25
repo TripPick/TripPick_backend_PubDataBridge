@@ -2,10 +2,10 @@ package com.example.TripPick_backend_PubDataBridge.service;
 
 import com.example.TripPick_backend_PubDataBridge.config.KafkaConfig;
 import com.example.TripPick_backend_PubDataBridge.config.PropertiesConfig;
-import com.example.TripPick_backend_PubDataBridge.domain.FestivalInfo;
-import com.example.TripPick_backend_PubDataBridge.domain.event.FestivalEvent;
-import com.example.TripPick_backend_PubDataBridge.dto.response.FestivalResponse;
-import com.example.TripPick_backend_PubDataBridge.event.producer.FestivalProducer;
+import com.example.TripPick_backend_PubDataBridge.domain.TourCourseItem;
+import com.example.TripPick_backend_PubDataBridge.domain.event.TourCourseItemEvent;
+import com.example.TripPick_backend_PubDataBridge.dto.response.TourCourseItemResponse;
+import com.example.TripPick_backend_PubDataBridge.event.producer.TourCourseItemProducer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +20,10 @@ import java.net.URI;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class FestivalService {
+public class TourCourseItemService {
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
-    private final FestivalProducer festivalProducer;
+    private final TourCourseItemProducer tourCourseItemProducer;
     private final PropertiesConfig propertiesConfig;
 
     public void fetchAndSend(String contentTypeId, String contentId) {
@@ -39,7 +39,7 @@ public class FestivalService {
 
     @Transactional
     public void fetchAndSendInfo(String serviceKey, String contentTypeId, String contentId) {
-        String rawUrl = "https://apis.data.go.kr/B551011/KorService2/detailIntro2";
+        String rawUrl = "https://apis.data.go.kr/B551011/KorService2/detailInfo2";
         String url = UriComponentsBuilder.newInstance()
                 .uri(URI.create(rawUrl))
                 .queryParam("serviceKey", serviceKey)
@@ -54,10 +54,10 @@ public class FestivalService {
 
         log.info("요청 URL: {}", url);
 
-        FestivalResponse response = null;
+        TourCourseItemResponse response = null;
 
         try {
-            response = restTemplate.getForObject(url, FestivalResponse.class);
+            response = restTemplate.getForObject(url, TourCourseItemResponse.class);
 
             if (response != null) {
                 log.info("API 응답 객체 (JSON): {}", objectMapper.writeValueAsString(response));
@@ -76,29 +76,20 @@ public class FestivalService {
             return;
         }
 
-        for (FestivalResponse.Item dto : response.getResponse().getBody().getItems().getItem()) {
-            FestivalInfo entity = FestivalInfo.builder()
+        for (TourCourseItemResponse.Item dto : response.getResponse().getBody().getItems().getItem()) {
+            TourCourseItem entity = TourCourseItem.builder()
                     .contentid(dto.getContentid())
-                    .agelimit(dto.getAgelimit())
-                    .bookingplace(dto.getBookingplace())
-                    .discountinfofestival(dto.getDiscountinfofestival())
-                    .eventhomepage(dto.getEventhomepage())
-                    .eventplace(dto.getEventplace())
-                    .eventstartdate(dto.getEventstartdate())
-                    .placeinfo(dto.getPlaceinfo())
-                    .playtime(dto.getPlaytime())
-                    .program(dto.getProgram())
-                    .spendtimefestival(dto.getSpendtimefestival())
-                    .sponsor1(dto.getSponsor1())
-                    .sponsor1tel(dto.getSponsor1tel())
-                    .sponsor2(dto.getSponsor2())
-                    .sponsor2tel(dto.getSponsor2tel())
-                    .subevent(dto.getSubevent())
-                    .usetimefestival(dto.getUsetimefestival())
+                    .subcontentid(dto.getSubcontentid())
+                    .subdetailalt(dto.getSubdetailalt())
+                    .subdetailimg(dto.getSubdetailimg())
+                    .subdetailoverview(dto.getSubdetailoverview())
+                    .subname(dto.getSubname())
+                    .subnum(dto.getSubnum())
                     .build();
 
-            FestivalEvent event = FestivalEvent.fromEntity("festival", entity);
-            festivalProducer.send(KafkaConfig.topics.FESTIVAL, event);
+            TourCourseItemEvent event = TourCourseItemEvent.fromEntity("tourcourseitem", entity);
+            tourCourseItemProducer.send(KafkaConfig.topics.TOURCOURSEITEM, event);
         }
     }
+
 }

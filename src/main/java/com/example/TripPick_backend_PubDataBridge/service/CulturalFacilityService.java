@@ -78,7 +78,7 @@ public class CulturalFacilityService {
 
         for (CulturalFacilityResponse.Item dto : response.getResponse().getBody().getItems().getItem()) {
             CulturalFacilityInfo entity = CulturalFacilityInfo.builder()
-                    .contentId(dto.getContentid())
+                    .contentid(dto.getContentid())
                     .accomcountculture(dto.getAccomcountculture())
                     .chkbabycarriageculture(dto.getChkbabycarriageculture())
                     .chkcreditcardculture(dto.getChkcreditcardculture())

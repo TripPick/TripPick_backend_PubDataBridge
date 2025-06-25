@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
 public class FestivalInfo {
 
     @Id
-    @Column(name = "contentId")
-    private String contentId;
+    @Column(name = "contentid")
+    private String contentid;
 
     @Column(name = "agelimit", length = 225)
     private String agelimit;
@@ -71,5 +71,4 @@ public class FestivalInfo {
 
     @Column(name = "usetimefestival", length = 225)
     private String usetimefestival;
-
 }
