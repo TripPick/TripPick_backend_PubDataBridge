@@ -23,4 +23,4 @@ spring:
 
 trip-pick:
   api:
-    service-key: "mhm4pxzDb1tMmFfIpFu46wVmtJ41VZcG1inaHQjbKZyuc07pbBfGbeFjdjskoh1Jc8RcDMVok4oDAvHWpNIx5Q=="
+    service-key: "service-key"

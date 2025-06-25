@@ -16,6 +16,7 @@ public class ListEventConsumer {
     private final CulturalFacilityService culturalFacilityService;
     private final FestivalService festivalService;
     private final TourSpotService tourSpotService;
+    private final TourCourseInfoService tourCourseInfoService;
     private final TourCourseItemService tourCourseItemService;
 
     @KafkaListener(topics = KafkaConfig.topics.SEARCH)
@@ -36,6 +37,7 @@ public class ListEventConsumer {
                 tourSpotService.fetchAndSend(contentTypeId, contentId);
                 break;
             case KafkaConfig.contentTypeId.TOURCOURSE:
+                tourCourseInfoService.fetchAndSend(contentTypeId, contentId);
                 tourCourseItemService.fetchAndSend(contentTypeId, contentId);
                 break;
             default:

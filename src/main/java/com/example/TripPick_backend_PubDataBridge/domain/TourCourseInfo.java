@@ -19,18 +19,18 @@ public class TourCourseInfo {
     @Column(name = "contentid")
     private String contentid;
 
-    @Column(name = "distance", length = 225)
+    @Column(name = "distance")
     private String distance;
 
-    @Column(name = "infocentertourcourse", length = 225)
+    @Column(name = "infocentertourcourse")
     private String infocentertourcourse;
 
-    @Column(name = "schedule", length = 225)
+    @Column(name = "schedule")
     private String schedule;
 
-    @Column(name = "taketime", length = 225)
+    @Column(name = "taketime")
     private String taketime;
 
-    @Column(name = "theme", length = 225)
+    @Column(name = "theme")
     private String theme;
 }
