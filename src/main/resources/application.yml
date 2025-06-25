@@ -20,7 +20,3 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.add.type.headers: true
-
-trip-pick:
-  api:
-    service-key: "3CPcqB1/gvOXM7ywRGxjUD83/TetVGgf6k2TlDiEp/5L2bE6pQafYl22x1Gj4UmzncDS5wI4OLptNMPuhcCcqw=="

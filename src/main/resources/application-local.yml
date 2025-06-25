@@ -35,3 +35,7 @@ spring:
     # false로 설정하는 것이 성능 및 예기치 않은 동작 방지에 권장됩니다.
     open-in-view: false
     database-platform: org.hibernate.dialect.MySQL8Dialect
+    
+trip-pick:
+  api:
+    service-key: "3CPcqB1/gvOXM7ywRGxjUD83/TetVGgf6k2TlDiEp/5L2bE6pQafYl22x1Gj4UmzncDS5wI4OLptNMPuhcCcqw=="
