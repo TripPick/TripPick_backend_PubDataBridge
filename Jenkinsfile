@@ -91,7 +91,7 @@ pipeline {
 //             }
             steps {
                 script {
-                    docker.build "wkddnjs9/trippick_backend_pubdatabridge:0.0.1"
+                    docker.build "${DOCKER_IMAGE_NAME}"
                 }
             }
         }
