@@ -31,7 +31,7 @@ public class SearchService {
 
     String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "0 0 */6 * * *")
     public void autoFetchAndSend() {
         String serviceKey = propertiesConfig.getServiceKey();
         //12: 관광지, 14: 문화시설, 15: 축제공연행사 25: 여행코스
